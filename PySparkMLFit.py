@@ -21,7 +21,7 @@ def process(spark, train_data, test_data):
     test = spark.read.parquet(test_data, header=True, inferSchema=True)
 
     features = VectorAssembler(
-        inputCols=['ad_id', 'target_audience_count', 'has_video', 'is_cpm', 'is_cpc', 'ad_cost', 'day_count'],
+        inputCols=['target_audience_count', 'has_video', 'is_cpm', 'is_cpc', 'ad_cost', 'day_count'],
         outputCol='features')
 
     dtr = DecisionTreeRegressor(labelCol='ctr', featuresCol='features')
@@ -78,17 +78,17 @@ def process(spark, train_data, test_data):
     if rmseDrt < rmseRfr:
         if rmseDrt < rmseGbtr:
             rmse = rmseDrt
-            modelDtr.write().overwrite().save(MODEL_PATH)
+            modelDtr.bestModel.write().overwrite().save(MODEL_PATH)
         else:
             rmse = rmseGbtr
-            modelGbtr.write().overwrite().save(MODEL_PATH)
+            modelGbtr.bestModel.write().overwrite().save(MODEL_PATH)
     else:
         if rmseRfr < rmseGbtr:
             rmse = rmseRfr
-            modelRfr.write().overwrite().save(MODEL_PATH)
+            modelRfr.bestModel.write().overwrite().save(MODEL_PATH)
         else:
             rmse = rmseGbtr
-            modelGbtr.write().overwrite().save(MODEL_PATH)
+            modelGbtr.bestModel.write().overwrite().save(MODEL_PATH)
 
     print("MIN RMSE - "+str(rmse))
 

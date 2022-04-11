@@ -2,7 +2,6 @@ import io
 import sys
 
 from pyspark.ml import PipelineModel
-from pyspark.ml.tuning import CrossValidatorModel
 from pyspark.sql import SparkSession
 
 # Используйте как путь откуда загрузить модель
@@ -11,7 +10,7 @@ MODEL_PATH = 'spark_ml_model'
 
 def process(spark, input_file, output_file):
     test_data = spark.read.parquet(input_file, header=True, inferSchema=True)
-    persModel = CrossValidatorModel.load(MODEL_PATH)
+    persModel = PipelineModel.load(MODEL_PATH)
     predictions = persModel.transform(test_data)
     predictions.select(['ad_id', 'prediction']).write.csv(output_file)
 
